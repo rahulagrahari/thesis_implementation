@@ -1,25 +1,36 @@
 {
-   "vehicle" :
-   [
-     {
-       "type" : "car",
-       "dimension" : [40, 20],
-       "color": "red"
-     },
-      {
-       "type" : "bus",
-       "dimension" : [60, 30],
-       "color": "orange"
-     },
-      {
-       "type" : "truck",
-       "dimension" : [70, 35],
-       "color": "blue"
-     },
-      {
-       "type" : "bike",
-       "dimension" : [20, 10],
-       "color": "black"
-     }
-   ]
+  "vehicle": [
+    {
+      "type": "car",
+      "dimension": [
+        20,
+        10
+      ],
+      "color": "red"
+    },
+    {
+      "type": "bus",
+      "dimension": [
+        30,
+        10
+      ],
+      "color": "orange"
+    },
+    {
+      "type": "truck",
+      "dimension": [
+        70,
+        35
+      ],
+      "color": "blue"
+    },
+    {
+      "type": "bike",
+      "dimension": [
+        20,
+        10
+      ],
+      "color": "black"
+    }
+  ]
 }
