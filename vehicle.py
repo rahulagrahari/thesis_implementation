@@ -63,8 +63,8 @@ class vehicle:
         acc = vehicle_info[0]
         ret = vehicle_info[1]
         speed = vehicle_info[2]
-        pos = vehicle_info[3]
-        lane = vehicle_info[4]
+        own_pos = vehicle_info[3]
+        own_lane = vehicle_info[4]
         dir = vehicle_info[5]
         request = vehicle_info[7]
         flag = vehicle_info[8]
@@ -79,11 +79,11 @@ class vehicle:
         d_car = 20
         d_bus = 40
         d_critical = 15
-        own_pos = self.control.position
-        own_lane = self.control.lane
+        # own_pos = self.control.position
+        # own_lane = self.control.lane
         # print("()()()()()()(()()()()()))()(()())())())()(",self,own_lane)
         if self.type == 'bus':
-            if own_pos[0] >= 105:
+            if own_pos[0] >= 300:
                 speed[0] = speed[0] - (speed[0] * max_retardation) / 100
         elif flag:
             if request[2] != 0:
@@ -99,19 +99,39 @@ class vehicle:
                     request[3] = request[3] - speed[0]
                 else:
                     if request[4] == self:
-                        speed[0] = request[0]
+                        # speed[0] = request[0]
                         if not own_pos[1] <= 0:
-                            speed[1] = -0.4
-                            speed[0] = 0.4
+                            if request[6] == 1:
+                                speed[1] = -0.3
+                                speed[0] = 0.3
+                            elif request[6] == 2:
+                                if request[7]:
+                                    speed[1] = -0.3
+                                    speed[0] = 0.3
+                                elif request[8]:
+                                    speed[1] = -0.3
+                                    speed[0] = 0.3
+                                elif request[5] is not None:
+                                    speed[1] = -0.5
+                                    speed[0] = 0.5
+                                else:
+                                    speed[1] = -0.5
+                                    speed[0] = 0.5
+                            else:
+                                if request[7]:
+                                    speed[1] = -0.3
+                                    speed[0] = 0.3
+                                else:
+                                    speed[1] = -0.4
+                                    speed[0] = 0.4
 
                         else:
+
                             speed[1] = 0
                             speed[0] = 0.4
 
                             self.control.request = []
                             self.control.flag = False
-                            self.lane = 1
-                            self.control.lane = 1
                             print("---------------Hi I am done with the lane change *+*+*+*++*+*+*+*+*+*+*+*+*+*+*",
                                   self, " ", self.control.lane, "+++++++++++++++++++++++++++++++++++++++++++++++"
                                                                 "++++++++++++++")
@@ -122,12 +142,16 @@ class vehicle:
         else:
             if len(nei) != 0:
                 vehicle_in_front_check = False
+                vehicle_in_back = False
+                vehicle_in_front = False
                 for veh in nei:
                     nei_pos = veh.control.position
                     nei_lane = veh.control.lane
                     distance = dist(own_pos[2], (own_pos[1] + own_pos[3]) / 2, nei_pos[0], (nei_pos[3] + nei_pos[1]) / 2)
                     # print(self, " in lane ", own_lane, " computing distance with ", veh, "which is in lane ", nei_lane,
                     #       " with distance ", distance)
+                    if own_pos[2] < nei_pos[0] and distance < 30 and veh.type is not 'bus':
+                        vehicle_in_front = True
                     if nei_lane == own_lane:
                         print(self, " in lane ", own_lane, " computing distance with ", veh, "which is in lane ", nei_lane,
                               " with distance ", distance)
@@ -147,6 +171,8 @@ class vehicle:
                                     if speed[0] < 0.5:
                                         print("distance more than safe, increasing speed")
                                         speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                            elif own_pos[2] > nei_pos[0]:
+                                vehicle_in_back = True
 
                         elif veh.type == 'bus':
                             if own_pos[2] < nei_pos[0]:
@@ -159,8 +185,9 @@ class vehicle:
                                         parallel_vehicle = None
                                         for i in nei:
                                             temp_lane = i.control.lane
+                                            temp_pos = i.control.position
                                             if temp_lane != own_lane:
-                                                temp_pos = i.control.position
+
                                                 if own_pos[0] > temp_pos[2]:
                                                     previous_vehicle = i
                                                     print("previous vehicle: ", previous_vehicle)
@@ -169,6 +196,9 @@ class vehicle:
                                                     print("parallel vehicle: ", parallel_vehicle)
                                                     if abs(own_pos[0] - temp_pos[0]) < 5:
                                                         parallel_vehicle = i
+                                            else:
+                                                if own_pos[0] > temp_pos[2]:
+                                                    vehicle_in_back = True
 
                                         # -----the calculation is based on equation of motions
                                         # -----v = u + at
@@ -192,17 +222,20 @@ class vehicle:
                                             self.control.retardation = ret
                                             speed[0] = speed[0] - ret
                                             self.control.requestedSpeed = [speed[0], ret, round(d_stop_time),
-                                                                           distance_by_potential_car, self, previous_vehicle]
+                                                                           distance_by_potential_car, self,
+                                                                           previous_vehicle, 1, vehicle_in_back,
+                                                                           vehicle_in_front]
                                             delta_d2 = math.sqrt(pow(d_critical, 2) + pow(35, 2))
                                             distance_by_previous_car = delta_d2 - delta_d1 - d_stop
                                             reduced_speed_previous_vehicle = (delta_d2 - delta_d1 - d_stop) / time
                                             retardation_previous_vehicle = (previous_vehicle.control.
-                                                                            speed[0] - reduced_speed_previous_vehicle) / \
-                                                                            d_stop_time
+                                                                            speed[0] - reduced_speed_previous_vehicle)\
+                                                                             / d_stop_time
                                             previous_vehicle.control.requestedSpeed = [
                                                 previous_vehicle.control.speed[0]-retardation_previous_vehicle,
                                                 retardation_previous_vehicle,
-                                                round(d_stop_time), distance_by_previous_car, self, previous_vehicle]
+                                                round(d_stop_time), distance_by_previous_car, self, previous_vehicle, 1,
+                                                vehicle_in_back, vehicle_in_front]
 
                                             self.control.flag = True
                                             previous_vehicle.control.flag = True
@@ -210,9 +243,15 @@ class vehicle:
                                                 is not None and parallel_vehicle is None:
                                             print("---------------------------triggering case 2----------------------"
                                                   "-----")
-                                            self.control.requestedSpeed = [speed[0], 0, 0,
-                                                                           0, self,
-                                                                           previous_vehicle]
+                                            self.control.requestedSpeed = [speed[0],
+                                                                           0,
+                                                                           0,
+                                                                           0,
+                                                                           self,
+                                                                           previous_vehicle,
+                                                                           2,
+                                                                           vehicle_in_back,
+                                                                           vehicle_in_front]
                                             self.control.flag = True
                                         elif previous_vehicle is None and parallel_vehicle is not None:
                                             print("---------------------------triggering case 3-----------------------"
@@ -223,13 +262,20 @@ class vehicle:
                                             ret = abs((speed[0] - reduced_speed_potential_car) / d_stop_time)
                                             self.control.retardation = ret
                                             speed[0] = speed[0] - ret
-                                            self.control.requestedSpeed = [speed[0], ret, round(d_stop_time),
-                                                                           distance_by_potential_car, self,
-                                                                           previous_vehicle]
+                                            self.control.requestedSpeed = [speed[0],
+                                                                           ret,
+                                                                           round(d_stop_time),
+                                                                           distance_by_potential_car,
+                                                                           self,
+                                                                           previous_vehicle,
+                                                                           3,
+                                                                           vehicle_in_back,
+                                                                           vehicle_in_front]
                                             self.control.flag = True
 
                                 elif distance > d_bus:
                                     speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+
                 if not vehicle_in_front_check:
                     if self.id is not 3:
                         if not speed[0] > 0.5:
@@ -261,7 +307,8 @@ class vehicle:
         print(speed, self)
         self.canvas.move(self.new_vehicle, speed[0], speed[1])
         pos = self.canvas.coords(self.new_vehicle)
-        if pos[1] == 0:
+        print(self, pos, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        if pos[1] < 18:
             updated_lane = 1
         else:
             updated_lane = 2
