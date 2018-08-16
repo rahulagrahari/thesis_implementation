@@ -73,8 +73,9 @@ class vehicle:
         min_speed = []
         min_retardation = 15
         max_retardation = 15
-        min_acceleration = 2
+        min_acceleration = 0.15
         max_acceleration = 50
+
 
         d_car = 20
         d_bus = 40
@@ -83,8 +84,53 @@ class vehicle:
         # own_lane = self.control.lane
         # print("()()()()()()(()()()()()))()(()())())())()(",self,own_lane)
         if self.type == 'bus':
-            if own_pos[0] >= 300:
-                speed[0] = speed[0] - (speed[0] * max_retardation) / 100
+            if self.id == 6 and 302.8 >= own_pos[0] >= 300:
+                if self.control.stop_counter < 200:
+                    speed[0] = speed[0] - (speed[0] * max_retardation) / 100
+                    self.control.stop_counter += 1
+                    print(self.control.stop_counter, "##############")
+
+                else:
+                    if speed[0] == 0:
+                        speed[0] = 0.2
+                    else:
+                        if speed[0] < 0.5:
+                            # speed[0] = speed[0] + (speed[0] * 1) / 100
+                            speed[0] = speed[0] + min_acceleration
+
+            elif self.id == 10 and 602.8 >= own_pos[0] >= 600:
+                if self.control.stop_counter < 200:
+                    speed[0] = speed[0] - (speed[0] * max_retardation) / 100
+                    self.control.stop_counter += 1
+                    print(self.control.stop_counter, "##############")
+
+                else:
+                    if speed[0] == 0:
+                        speed[0] = 0.2
+                    else:
+                        if speed[0] < 0.5:
+                            # speed[0] = speed[0] + (speed[0] * 1) / 100
+                            speed[0] = speed[0] + min_acceleration
+            elif self.id == 15 and 902.8 >= own_pos[0] >= 900:
+                if self.control.stop_counter < 200:
+                    speed[0] = speed[0] - (speed[0] * max_retardation) / 100
+                    self.control.stop_counter += 1
+                    print(self.control.stop_counter, "##############")
+
+                else:
+                    if speed[0] == 0:
+                        speed[0] = 0.2
+                    else:
+                        if speed[0] < 0.5:
+                            # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                            speed[0] = speed[0] + min_acceleration
+            else:
+                if speed[0] == 0:
+                    speed[0] = 0.2
+                else:
+                    if speed[0] < 0.5:
+                        # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                        speed[0] = speed[0] + min_acceleration
         elif flag:
             if request[2] != 0:
                 speed[0] = request[0]
@@ -170,7 +216,8 @@ class vehicle:
                                 elif distance > d_car:
                                     if speed[0] < 0.5:
                                         print("distance more than safe, increasing speed")
-                                        speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                                        # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                                        speed[0] = speed[0] + min_acceleration
                             elif own_pos[2] > nei_pos[0]:
                                 vehicle_in_back = True
 
@@ -190,12 +237,11 @@ class vehicle:
 
                                                 if own_pos[0] > temp_pos[2]:
                                                     previous_vehicle = i
-                                                    print("previous vehicle: ", previous_vehicle)
+                                                    print("previous vehicle: ", previous_vehicle, "\n \n \n")
                                                 elif own_pos[0] <= temp_pos[0] or own_pos[0] > temp_pos[0]:
-                                                    print(temp_pos[0] - own_pos[0],i, "++++", temp_pos)
-                                                    print("parallel vehicle: ", parallel_vehicle)
-                                                    if abs(own_pos[0] - temp_pos[0]) < 5:
+                                                    if abs(own_pos[0] - temp_pos[0]) < 30:
                                                         parallel_vehicle = i
+                                                        print("parallel vehicle: ", parallel_vehicle, "\n \n \n")
                                             else:
                                                 if own_pos[0] > temp_pos[2]:
                                                     vehicle_in_back = True
@@ -274,23 +320,22 @@ class vehicle:
                                             self.control.flag = True
 
                                 elif distance > d_bus:
-                                    speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                                    # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                                    speed[0] = speed[0] + min_acceleration
 
                 if not vehicle_in_front_check:
-                    if self.id is not 3:
-                        if not speed[0] > 0.5:
-                            speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                    if not speed[0] > 0.5:
+                        # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                        speed[0] = speed[0] + min_acceleration
                     else:
                         speed[0] = 0.5
 
             else:
                 print("===================", self, " have no neighbour========================")
-                if self.id is not 3:
-                    if not speed[0] > 0.5:
-                        speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
-                else:
-                    speed[0] = 0.5
 
+                if not speed[0] > 0.5:
+                    # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                    speed[0] = speed[0] + min_acceleration
         if speed[0] < 0.01:
 
             if self.type is not 'bus':

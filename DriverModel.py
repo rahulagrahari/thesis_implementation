@@ -12,6 +12,7 @@ class DriverModel:
         self.requestedSpeed = []
         self.neighbour_info = []
         self.flag = False
+        self.stop_counter = 0
 
     def __str__(self):
         return "Control Object" + str(self)
@@ -30,4 +31,5 @@ class DriverModel:
                 self.direction,
                 self.neighbour_info,
                 self.requestedSpeed,
-                self.flag]
+                self.flag,
+                self.stop_counter]

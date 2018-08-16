@@ -29,6 +29,8 @@ class vehicleGenerator:
 
         # canvas.create_rectangle(101.66, 35, 101.66, 45, fill='green')
         canvas.create_rectangle(301.66, 35, 301.66, 45, fill='green')
+        canvas.create_rectangle(601.66, 35, 601.66, 45, fill='green')
+        canvas.create_rectangle(901.66, 35, 901.66, 45, fill='green')
         canvas.create_rectangle(0, 1, GetSystemMetrics(0), 1, fill='black')
         canvas.create_rectangle(0, 50, GetSystemMetrics(0), 50, fill='black')
         gap = 5
@@ -53,6 +55,8 @@ class vehicleGenerator:
             self.parallel_and_previous_car_available()
         elif case == 3:
             self.parallel_and_previous_missing()
+        elif case == 4:
+            self.random_traffic()
         else:
             print("wrong output")
 
@@ -96,6 +100,49 @@ class vehicleGenerator:
         car5 = vehicle('car', self.canvas, 2, 40, 5)
         bus = vehicle('bus', self.canvas, 2, 100, 6)
         v_list = [car1, car3, car5, bus]
+        g = GetNeighbour(v_list)
+        self.vehicle_list = v_list
+
+    def random_traffic(self):
+        # lane1------------
+        car1 = vehicle('car', self.canvas, 1, -360, 7)
+        car2 = vehicle('car', self.canvas, 1, -320, 8)
+        car3 = vehicle('car', self.canvas, 1, -120, 11)
+        car4 = vehicle('car', self.canvas, 1, -80, 12)
+        car5 = vehicle('car', self.canvas, 1, -40, 13)
+        car6 = vehicle('car', self.canvas, 1, 0, 1)
+        car7 = vehicle('car', self.canvas, 1, 40, 2)
+        car8 = vehicle('car', self.canvas, 1, 80, 3)
+
+        # lane 2------------
+        car9 = vehicle('car', self.canvas, 2, -480, 16)
+        car10 = vehicle('bus', self.canvas, 2, -420, 15)
+        car11 = vehicle('car', self.canvas, 2, -380, 14)
+        car12 = vehicle('car', self.canvas, 2, -220, 9)
+        car13 = vehicle('bus', self.canvas, 2, -160, 10)
+        car14 = vehicle('car', self.canvas, 2, -40, 7)
+        car15 = vehicle('car', self.canvas, 2, 0, 4)
+        car16 = vehicle('car', self.canvas, 2, 40, 5)
+        car17 = vehicle('bus', self.canvas, 2, 100, 6)
+
+        v_list = [car1,
+                  car2,
+                  car3,
+                  car4,
+                  car5,
+                  car6,
+                  car7,
+                  car8,
+                  car9,
+                  car10,
+                  car11,
+                  car12,
+                  car13,
+                  car14,
+                  car15,
+                  car16,
+                  car17]
+
         g = GetNeighbour(v_list)
         self.vehicle_list = v_list
 
