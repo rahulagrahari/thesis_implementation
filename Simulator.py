@@ -1,4 +1,4 @@
-from ThesisImplementation.vehicleGenerator import vehicleGenerator
+from vehicleGenerator import vehicleGenerator
 from win32api import GetSystemMetrics
 from tkinter import *
 import time
@@ -12,11 +12,12 @@ canvas.pack()
 vg = vehicleGenerator(canvas, 4)
 v = vg.vehicle_list
 
+
 while not crashed:
     for i in v:
         i.move()
     tk.update()
-    time.sleep(.01)
+    time.sleep(.005)
 
 tk.mainloop()
 

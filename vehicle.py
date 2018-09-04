@@ -5,12 +5,12 @@ Created on Tue Jul 24 09:05:15 2018
 """
 import math
 
-from ThesisImplementation.DriverModel import DriverModel
+from DriverModel import DriverModel
 # import DrivingLogic
 import sys
-import ThesisImplementation.constant as constant
+import constant as constant
 import json
-from ThesisImplementation.neighbour import GetNeighbour
+from neighbour import GetNeighbour
 
 
 def dist(x1, y1, x2, y2):
@@ -20,7 +20,7 @@ def dist(x1, y1, x2, y2):
 
 class vehicle:
 
-    def __init__(self, type, canvas, lane, offset, ids):
+    def __init__(self, type, canvas, lane, offset, ids, first=False):
 
         self.type = type
         self.id = ids
@@ -30,6 +30,7 @@ class vehicle:
         self.canvas = canvas
         self.lane = lane
         self.control = DriverModel()
+        self.isFirst = first
 
         if type not in constant.vehicle_type:
             print("invalid vehicle type, cannot create new vehicle")
@@ -73,10 +74,10 @@ class vehicle:
         min_speed = []
         min_retardation = 15
         max_retardation = 15
-        min_acceleration = 0.15
+        min_acceleration = 0.14
         max_acceleration = 50
-
-
+        speedCheck = 0.5
+        distance = 0
         d_car = 20
         d_bus = 40
         d_critical = 15
@@ -88,13 +89,13 @@ class vehicle:
                 if self.control.stop_counter < 200:
                     speed[0] = speed[0] - (speed[0] * max_retardation) / 100
                     self.control.stop_counter += 1
-                    print(self.control.stop_counter, "##############")
+                    # print(self.control.stop_counter, "##############")
 
                 else:
                     if speed[0] == 0:
                         speed[0] = 0.2
                     else:
-                        if speed[0] < 0.5:
+                        if speed[0] < speedCheck:
                             # speed[0] = speed[0] + (speed[0] * 1) / 100
                             speed[0] = speed[0] + min_acceleration
 
@@ -102,40 +103,40 @@ class vehicle:
                 if self.control.stop_counter < 200:
                     speed[0] = speed[0] - (speed[0] * max_retardation) / 100
                     self.control.stop_counter += 1
-                    print(self.control.stop_counter, "##############")
+                    # print(self.control.stop_counter, "##############")
 
                 else:
                     if speed[0] == 0:
                         speed[0] = 0.2
                     else:
-                        if speed[0] < 0.5:
+                        if speed[0] < speedCheck:
                             # speed[0] = speed[0] + (speed[0] * 1) / 100
                             speed[0] = speed[0] + min_acceleration
             elif self.id == 15 and 902.8 >= own_pos[0] >= 900:
                 if self.control.stop_counter < 200:
                     speed[0] = speed[0] - (speed[0] * max_retardation) / 100
                     self.control.stop_counter += 1
-                    print(self.control.stop_counter, "##############")
+                    # print(self.control.stop_counter, "##############")
 
                 else:
                     if speed[0] == 0:
                         speed[0] = 0.2
                     else:
-                        if speed[0] < 0.5:
+                        if speed[0] < speedCheck:
                             # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
                             speed[0] = speed[0] + min_acceleration
             else:
                 if speed[0] == 0:
                     speed[0] = 0.2
                 else:
-                    if speed[0] < 0.5:
+                    if speed[0] < speedCheck:
                         # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
                         speed[0] = speed[0] + min_acceleration
         elif flag:
             if request[2] != 0:
                 speed[0] = request[0]
                 request[3] = request[3] - speed[0]
-                print("-------", request[1], self, "iteration", request[2])
+                # print("-------", request[1], self, "iteration", request[2])
                 reduced_speed = speed[0] - request[1]
                 request[0] = reduced_speed
                 request[2] = request[2] - 1
@@ -178,9 +179,9 @@ class vehicle:
 
                             self.control.request = []
                             self.control.flag = False
-                            print("---------------Hi I am done with the lane change *+*+*+*++*+*+*+*+*+*+*+*+*+*+*",
-                                  self, " ", self.control.lane, "+++++++++++++++++++++++++++++++++++++++++++++++"
-                                                                "++++++++++++++")
+                            # print("---------------Hi I am done with the lane change *+*+*+*++*+*+*+*+*+*+*+*+*+*+*",
+                            #       self, " ", self.control.lane, "+++++++++++++++++++++++++++++++++++++++++++++++"
+                            #                                     "++++++++++++++")
                             if request[5] is not None:
                                 request[5].control.request = []
                                 request[5].control.flag = False
@@ -199,8 +200,8 @@ class vehicle:
                     if own_pos[2] < nei_pos[0] and distance < 30 and veh.type is not 'bus':
                         vehicle_in_front = True
                     if nei_lane == own_lane:
-                        print(self, " in lane ", own_lane, " computing distance with ", veh, "which is in lane ", nei_lane,
-                              " with distance ", distance)
+                        # print(self, " in lane ", own_lane, " computing distance with ", veh, "which is in lane ", nei_lane,
+                        #       " with distance ", distance)
                         if veh.type == 'car':
                             if own_pos[2] < nei_pos[0]:
                                 vehicle_in_front_check = True
@@ -208,15 +209,15 @@ class vehicle:
                                     speed[0] = speed[0]
                                 elif distance < d_car:
                                     if distance < d_critical:
-                                        print("distance less than critical, reducing speed")
+                                        # print("distance less than critical, reducing speed")
                                         speed[0] = speed[0] - (speed[0] * min_retardation) / 100
                                     else:
-                                        print("distance less than safe, reducing speed")
+                                        # print("distance less than safe, reducing speed")
                                         speed[0] = speed[0] - (speed[0] * min_retardation) / 100
                                 elif distance > d_car:
-                                    if speed[0] < 0.5:
-                                        print("distance more than safe, increasing speed")
-                                        # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                                    if speed[0] < speedCheck:
+                                        # print("distance more than safe, increasing speed")
+                                        # speeds[0] = speed[0] + (speed[0] * min_acceleration) / 100
                                         speed[0] = speed[0] + min_acceleration
                             elif own_pos[2] > nei_pos[0]:
                                 vehicle_in_back = True
@@ -259,8 +260,8 @@ class vehicle:
                                             d_stop = 0
                                         delta_d1 = d_bus - d_critical
                                         if previous_vehicle is not None and parallel_vehicle is not None:
-                                            print("---------------------------triggering case 1----------------------\
-                                            -----")
+                                            # print("---------------------------triggering case 1----------------------\
+                                            # -----")
                                             time = (d_car + d_stop + delta_d1) / parallel_vehicle.control.speed[0]
                                             distance_by_potential_car = d_stop + delta_d1
                                             reduced_speed_potential_car = distance_by_potential_car / time
@@ -287,8 +288,8 @@ class vehicle:
                                             previous_vehicle.control.flag = True
                                         elif previous_vehicle is None and parallel_vehicle is None or previous_vehicle \
                                                 is not None and parallel_vehicle is None:
-                                            print("---------------------------triggering case 2----------------------"
-                                                  "-----")
+                                            # print("---------------------------triggering case 2----------------------"
+                                            #       "-----")
                                             self.control.requestedSpeed = [speed[0],
                                                                            0,
                                                                            0,
@@ -300,8 +301,8 @@ class vehicle:
                                                                            vehicle_in_front]
                                             self.control.flag = True
                                         elif previous_vehicle is None and parallel_vehicle is not None:
-                                            print("---------------------------triggering case 3-----------------------"
-                                                  "----")
+                                            # print("---------------------------triggering case 3-----------------------"
+                                            #       "----")
                                             time = (d_car + d_stop + delta_d1) / parallel_vehicle.control.speed[0]
                                             distance_by_potential_car = d_stop + delta_d1
                                             reduced_speed_potential_car = distance_by_potential_car / time
@@ -324,16 +325,17 @@ class vehicle:
                                     speed[0] = speed[0] + min_acceleration
 
                 if not vehicle_in_front_check:
-                    if not speed[0] > 0.5:
-                        # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
-                        speed[0] = speed[0] + min_acceleration
-                    else:
-                        speed[0] = 0.5
+                    if not self.isFirst:
+                        if not speed[0] > speedCheck:
+                            # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
+                            speed[0] = speed[0] + min_acceleration
+                        else:
+                            speed[0] = 0.5
 
             else:
-                print("===================", self, " have no neighbour========================")
+                # print("===================", self, " have no neighbour========================")
 
-                if not speed[0] > 0.5:
+                if not speed[0] > speedCheck:
                     # speed[0] = speed[0] + (speed[0] * min_acceleration) / 100
                     speed[0] = speed[0] + min_acceleration
         if speed[0] < 0.01:
@@ -343,21 +345,21 @@ class vehicle:
             else:
                 speed[0] = 0
 
-        return speed
+        return speed, distance
 
     def move(self):
 
         info = self.control.vehicle_info
-        speed = self.DrivingLogic(info)
-        print(speed, self)
+        speed, distance = self.DrivingLogic(info)
+        # print(speed, self)
         self.canvas.move(self.new_vehicle, speed[0], speed[1])
         pos = self.canvas.coords(self.new_vehicle)
-        print(self, pos, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        # print(self, pos, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         if pos[1] < 18:
             updated_lane = 1
         else:
             updated_lane = 2
-        self.update_value({'speed': speed, 'position': pos, 'lane': updated_lane})
+        self.update_value({'speed': speed, 'position': pos, 'lane': updated_lane, 'distance': distance})
         return speed
 
     def update_value(self, vehicle_info):
@@ -367,4 +369,7 @@ class vehicle:
         driver_model.position = vehicle_info.get('position')
         driver_model.lane = vehicle_info.get('lane')
         driver_model.neighbour_info = nei.update_neighbour(self)
+        # nei.avg_speed_report(self, vehicle_info.get('speed'))
+        # nei.distance_report(self, vehicle_info.get('distance'))
+        # nei.print_report(self)
         # print(driver_model.neighbour_info)

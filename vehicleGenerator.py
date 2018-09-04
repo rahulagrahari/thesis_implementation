@@ -1,7 +1,7 @@
 # import random
 # from random import shuffle
-from ThesisImplementation.vehicle import vehicle
-from ThesisImplementation.neighbour import GetNeighbour
+from vehicle import vehicle
+from neighbour import GetNeighbour
 from win32api import GetSystemMetrics
 
 class vehicleGenerator:
@@ -64,11 +64,11 @@ class vehicleGenerator:
 
         car1 = vehicle('car', self.canvas, 1, 0, 1)
         car2 = vehicle('car', self.canvas, 1, 40, 2)
-        car3 = vehicle('car', self.canvas, 1, 80, 3)
+        car3 = vehicle('car', self.canvas, 1, 80, 3, True)
         car6 = vehicle('car', self.canvas, 2, -40, 7)
         car4 = vehicle('car', self.canvas, 2, 0, 4)
         car5 = vehicle('car', self.canvas, 2, 40, 5)
-        bus = vehicle('bus', self.canvas, 2, 100, 6)
+        bus = vehicle('bus', self.canvas, 2, 100, 6, True)
 
         v_list = [car1, car2, car3, car6, car4, car5, bus]
         g = GetNeighbour(v_list)
@@ -112,7 +112,7 @@ class vehicleGenerator:
         car5 = vehicle('car', self.canvas, 1, -40, 13)
         car6 = vehicle('car', self.canvas, 1, 0, 1)
         car7 = vehicle('car', self.canvas, 1, 40, 2)
-        car8 = vehicle('car', self.canvas, 1, 80, 3)
+        car8 = vehicle('car', self.canvas, 1, 80, 3, True)
 
         # lane 2------------
         car9 = vehicle('car', self.canvas, 2, -480, 16)
@@ -123,7 +123,7 @@ class vehicleGenerator:
         car14 = vehicle('car', self.canvas, 2, -40, 7)
         car15 = vehicle('car', self.canvas, 2, 0, 4)
         car16 = vehicle('car', self.canvas, 2, 40, 5)
-        car17 = vehicle('bus', self.canvas, 2, 100, 6)
+        car17 = vehicle('bus', self.canvas, 2, 100, 6, True)
 
         v_list = [car1,
                   car2,
@@ -156,23 +156,6 @@ class vehicleGenerator:
 
 
 
-
-
-
-        # luck = ['car', 'bus']
-        # for i in range(volume):
-        #     v = random.randrange(0, 2)
-        #     lane = random.randrange(1, 3)
-        #     print(luck[v]+" in the ", lane)
-        #     car = vehicle(luck[v], canvas, lane)
-        #     if v == 0:
-        #         self.car_list.append(car)
-        #     else:
-        #         self.bus_list.append(car)
-        #
-        # self.vehicle_list.extend(self.car_list)
-        # self.vehicle_list.extend(self.bus_list)
-        # shuffle(self.vehicle_list)
 
 
 
